@@ -169,7 +169,7 @@ input, select{
   text-align:center;
 }
 button{
-  padding:30px 60px;
+  padding:10px 20px;
   background:#d85375;
   border:none;
   color:white;
