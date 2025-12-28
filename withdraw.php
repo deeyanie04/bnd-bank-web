@@ -1,64 +1,56 @@
+
 <?php
 session_start();
 
-/* =========================
-   DATABASE CONFIG
-========================= */
-$host = "bnd-db.clkymsu642nu.ap-southeast-1.rds.amazonaws.com";
+// Ensure user is logged in
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    header("Location: login.php");
+    exit();
+}
+
+// Generate random 12-digit reference
+function generateReferenceNumber() {
+    return str_pad(mt_rand(1, 999999999999), 12, '0', STR_PAD_LEFT);
+}
+
+// RDS configuration
+$host = "bnd-db.clkymsu642nu.ap-southeast-1.rds.amazonaws.com"; // e.g., mydb.abcdefg123.us-east-1.rds.amazonaws.com
 $dbname = "bank_db";
-$dbuser = "admin";
-$dbpass = "admin123";
+$username = "admin";
+$password = "admin123";
 
 try {
-    $pdo = new PDO(
-        "mysql:host=$host;dbname=$dbname;charset=utf8",
-        $dbuser,
-        $dbpass,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-    );
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    die("Database connection failed");
+    die(json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]));
 }
 
-/* =========================
-   LOGIN CHECK
-========================= */
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit;
-}
+// Get logged-in user
+$user_id = $_SESSION['user_id'] ?? 1;
 
-$user_id = $_SESSION['user_id'];
-
-/* =========================
-   HANDLE AJAX POST
-========================= */
+// Handle POST withdrawal/transfer
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    header("Content-Type: application/json");
-
     $amount = floatval($_POST['amount'] ?? 0);
-    $toBank = trim($_POST['toBank'] ?? '');
-    $toAccount = trim($_POST['toAccount'] ?? '');
+    $toBank = $_POST['toBank'] ?? '';
+    $toAccount = $_POST['toAccount'] ?? '';
 
+    // Input validation
     if ($amount <= 0) {
-        echo json_encode(["error" => "Invalid amount"]);
-        exit;
+        echo json_encode(['error' => 'Invalid transfer amount']);
+        exit();
     }
-
     if (!preg_match('/^\d{16}$/', $toAccount)) {
-        echo json_encode(["error" => "Account number must be 16 digits"]);
-        exit;
-    }
-
-    if ($toBank === "") {
-        echo json_encode(["error" => "Please select a bank"]);
-        exit;
+        echo json_encode(['error' => 'Account number must be 16 digits']);
+        exit();
     }
 
     try {
+        // Begin transaction
         $pdo->beginTransaction();
 
-        $stmt = $pdo->prepare("SELECT balance FROM users WHERE id = ? FOR UPDATE");
+        // Get user's balance
+        $stmt = $pdo->prepare("SELECT id, account_number, balance FROM users WHERE user_id = ? FOR UPDATE");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -67,177 +59,328 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
 
         if ($user['balance'] < $amount) {
-            throw new Exception("Insufficient balance");
+            throw new Exception("Insufficient funds");
         }
 
+        // Deduct balance
         $newBalance = $user['balance'] - $amount;
+        $stmt = $pdo->prepare("UPDATE users SET balance = ? WHERE id = ?");
+        $stmt->execute([$newBalance, $user['id']]);
 
-        $pdo->prepare(
-            "UPDATE users SET balance = ? WHERE id = ?"
-        )->execute([$newBalance, $user_id]);
-
-        $ref = str_pad(mt_rand(1, 999999999999), 12, "0", STR_PAD_LEFT);
-
-        $pdo->prepare(
-            "INSERT INTO transactions 
+        // Record transaction
+        $refNumber = generateReferenceNumber();
+        $stmt = $pdo->prepare("INSERT INTO transactions 
             (sender_id, recipient_bank, recipient_account, type, amount, reference, timestamp)
-            VALUES (?, ?, ?, 'External Transfer', ?, ?, NOW())"
-        )->execute([$user_id, $toBank, $toAccount, $amount, $ref]);
+            VALUES (?, ?, ?, 'External Transfer', ?, ?, NOW())");
+        $stmt->execute([$user['id'], $toBank, $toAccount, $amount, $refNumber]);
 
         $pdo->commit();
 
         echo json_encode([
-            "success" => true,
-            "refNumber" => $ref,
-            "newBalance" => number_format($newBalance, 2)
+            'receipt' => "Transfer, Php " . number_format($amount, 2) . ",$toBank,$toAccount," . date("Y-m-d H:i:s") . ",$refNumber",
+            'refNumber' => $refNumber,
+            'newBalance' => number_format($newBalance, 2)
         ]);
-        exit;
-
+        exit();
     } catch (Exception $e) {
         $pdo->rollBack();
-        echo json_encode(["error" => $e->getMessage()]);
-        exit;
+        echo json_encode(['error' => $e->getMessage()]);
+        exit();
     }
 }
 
-/* =========================
-   LOAD USER INFO
-========================= */
-$stmt = $pdo->prepare(
-    "SELECT account_number, balance FROM users WHERE id = ?"
-);
+// Load user's account number for display
+$stmt = $pdo->prepare("SELECT account_number, balance FROM users WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$accountNumber = $user['account_number'];
-$balance = $user['balance'];
+$accountNumber = $user['account_number'] ?? 'Not Available';
+$balance = $user['balance'] ?? 0;
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Withdraw / Transfer</title>
-
-<style>
+<link rel="stylesheet" href="styles.css">
+<!-- Include your styles and JS (unchanged) -->
+</head><style>
+    
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+  text-decoration: none;
+  font-family: 'Josefin Sans', sans-serif;
 }
+
 body{
-  background:#f3f5f9;
+   background-color: #f3f5f9;
 }
-.container{
-  max-width:700px;
-  margin:50px auto;
-  background:#fff;
-  padding:30px;
-  border-radius:10px;
-  box-shadow:0 0 15px rgba(0,0,0,0.1);
+
+.wrapper{
+  display: flex;
+  position: relative;
 }
-h2{
-  color:#e2688a;
-  margin-bottom:10px;
+
+.wrapper .sidebar{
+  width: 300px;
+  height: 100%;
+  background:   #e2688a;
+  padding: 30px 0px;
+  position: fixed;
 }
-p{
-  margin-bottom:20px;
+
+.wrapper .sidebar ul li img{
+  width: 20px;
+  float: left;
 }
-input, button{
-  width:100%;
-  padding:12px;
-  margin-bottom:15px;
-  border-radius:5px;
-  border:1px solid #ccc;
+
+.wrapper .sidebar h2{
+  color: #fff;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 30px;
 }
-button{
-  background:#d85375;
-  color:white;
-  font-size:16px;
-  border:none;
-  cursor:pointer;
+
+.wrapper .sidebar ul li{
+  padding: 25px;
+  border-bottom: 1px solid #bdb8d7;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  text-indent: 10px;
+}    
+
+
+.wrapper .sidebar ul li a{
+  color: white;
+  display: block;
 }
-button:hover{
-  background:#c44565;
+
+.wrapper .sidebar ul li a .fas{
+  width: 25px;
 }
-.modal{
-  display:none;
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:#e2688a;
-  color:white;
-  padding:20px;
-  border-radius:10px;
-  text-align:center;
+
+.wrapper .sidebar ul li:hover{
+  background-color: #d85375;
 }
-.modal button{
-  background:#fff;
-  color:#e2688a;
-  margin-top:10px;
+    
+.wrapper .sidebar ul li:hover a{
+  color: #fff;
 }
+ 
+.wrapper .sidebar .social_media{
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+}
+
+.wrapper .sidebar .social_media a{
+  display: block;
+  width: 40px;
+  background: #d85375;
+  height: 40px;
+  line-height: 45px;
+  text-align: center;
+  margin: 0 5px;
+  color: #fff;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.wrapper .main_content{
+  width: 100%;
+  margin-left: 300px;
+}
+
+.wrapper .main_content .info{
+  margin: 20px;
+  color: #717171;
+  line-height: 25px;
+}
+.wrapper .main_content .info div{
+  margin-bottom: 20px;
+}
+
+#logo {
+  margin-left: 15% ;
+  margin-bottom: 5%;
+  max-width: 200px; 
+}
+
+
+.wrapper .main_content h2 {
+  color:  #e2688a;
+  margin-top: 10%;
+  margin-left: 5%;
+}
+
+   .textbox {
+      margin-top: 0.6%;
+      margin-left: 5%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 90%;
+      box-sizing: border-box;
+      display: inline-block;
+      background-color: #f3f3f3;
+      color: #717171;
+    }
+
+    .submit-button {
+    position: absolute;
+    justify-content: flex-end;
+    bottom: 0;
+    right: 0;
+    margin-top: 30px;
+    margin-right: 5%;
+    padding: 10px;
+    font-size: 16px;
+    background-color:  #d85375;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  background-color: #e2688a; 
+  color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  text-align: center;
+}
+
+.modal-content {
+  text-align: center;
+}
+
+.modal-close {
+  background-color: #d85375; 
+  text-align: center;
+  color: #fff;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px; 
+}
+
 </style>
-</head>
 
 <body>
-
-<div class="container">
-<h2>TRANSFER / WITHDRAW</h2>
-
-<p>
-Account Number: <b><?= htmlspecialchars($accountNumber) ?></b><br>
-Balance: <b>Php <?= number_format($balance,2) ?></b>
-</p>
-
-<form onsubmit="submitTransfer(event)">
-<input type="text" id="toBank" placeholder="Bank Name" required>
-<input type="text" id="toAccount" placeholder="16-digit Account Number" maxlength="16" required>
-<input type="text" id="amount" placeholder="Amount" required>
-<button type="submit">TRANSFER</button>
-</form>
+<div class="wrapper">
+    <div class="sidebar">
+        <!-- Sidebar content unchanged -->
+    </div>
+    <div class="main_content">
+        <div class="header">
+            <h2>TRANSFER / WITHDRAW</h2>
+            <p>Banko ni Dianne ang Best For You!</p>
+        </div>
+        <div class="transfer">
+            <form id="transferForm" onsubmit="submitTransfer(event)">
+                <div class="transfer_to">
+                    <h3>Transfer From</h3>
+                    <p>Account Number: <?php echo htmlspecialchars($accountNumber); ?> (Balance: Php <?php echo number_format($balance,2); ?>)</p>
+                </div>
+                <div class="transfer_from">
+                    <h3>Transfer To</h3>
+                    <input type="text" id="outputTextField" placeholder="Select Other Bank" readonly required>
+                    <div class="dropdown">
+                        <button>Select Bank</button>
+                        <div class="dropdown-content">
+                            <a href="#" onclick="selectBank('Banko ni Yunise')">Banko ni Yunise</a>
+                            <a href="#" onclick="selectBank('Banko ni Vim')">Banko ni Vim</a>
+                            <a href="#" onclick="selectBank('Banko ni Mea')">Banko ni Mea</a>
+                            <a href="#" onclick="selectBank('Banko ni Ellaine')">Banko ni Ellaine</a>
+                            <a href="#" onclick="selectBank('Banko na Debunk')">Banko na Debunk</a>
+                        </div>
+                    </div>
+                    <input type="text" class="accountnum" placeholder="Enter Account Number here" id="toAccount" oninput="allowDigitsOnly(this)" maxlength="16" minlength="16" required>
+                </div>
+                <div class="transfer_amount">
+                    <h3>Transfer Amount</h3>
+                    <input type="text" class="amount" placeholder="Enter amount here" name="amount" id="transferAmount" oninput="allowDigitsOnly(this)" required>
+                </div>
+                <button class="submit-button">TRANSFER</button>
+            </form>
+        </div>
+    </div>
 </div>
 
-<div id="modal" class="modal">
-<div id="modalContent"></div>
-<button onclick="closeModal()">Close</button>
+<div id="transferModal" class="modal">
+    <div id="transferModalContent" class="modal-content"></div>
+    <button class="modal-close" onclick="hideTransferModal()">Close</button>
 </div>
 
 <script>
-function submitTransfer(e){
-    e.preventDefault();
+function allowDigitsOnly(input) {
+    input.value = input.value.replace(/\D/g,'');
+}
+function selectBank(bankName) {
+    document.getElementById('outputTextField').value = bankName;
+}
+function submitTransfer(event) {
+    event.preventDefault();
+    var amount = document.getElementById("transferAmount").value;
+    var toBank = document.getElementById("outputTextField").value;
+    var toAccount = document.getElementById("toAccount").value;
 
-    const formData = new FormData();
-    formData.append("toBank", document.getElementById("toBank").value);
-    formData.append("toAccount", document.getElementById("toAccount").value);
-    formData.append("amount", document.getElementById("amount").value);
+    var formData = new FormData();
+    formData.append('amount', amount);
+    formData.append('toBank', toBank);
+    formData.append('toAccount', toAccount);
 
-    fetch("withdraw.php", {
-        method: "POST",
-        body: formData
-    })
-    .then(res => res.json())
+    fetch('withdraw.php', { method: 'POST', body: formData })
+    .then(response => response.json())
     .then(data => {
-        const modal = document.getElementById("modal");
-        const content = document.getElementById("modalContent");
-
-        if(data.error){
-            content.innerHTML = "<h3>FAILED</h3><p>"+data.error+"</p>";
-        }else{
-            content.innerHTML = `
-                <h3>SUCCESS</h3>
-                <p>Reference: ${data.refNumber}</p>
-                <p>New Balance: Php ${data.newBalance}</p>
-            `;
+        if (data.error) showTransferModalError(data.error);
+        else {
+            showTransferModal(amount, toBank, toAccount, data.refNumber, data.newBalance);
+            document.getElementById("transferAmount").value = "";
+            document.getElementById("toAccount").value = "";
+            document.getElementById("outputTextField").value = "";
         }
-        modal.style.display="block";
-    });
+    })
+    .catch(err => showTransferModalError('Transfer failed. Please try again.'));
 }
 
-function closeModal(){
-    document.getElementById("modal").style.display="none";
+function showTransferModal(amount, bank, account, refNumber, newBalance) {
+    var modal = document.getElementById("transferModal");
+    var content = document.getElementById("transferModalContent");
+    content.innerHTML = `<h3>TRANSFER SUCCESSFUL!</h3>
+                         <p>Amount: Php ${parseFloat(amount).toFixed(2)}</p>
+                         <p>To Bank: ${bank}</p>
+                         <p>To Account: ${account}</p>
+                         <p>Reference Number: ${refNumber}</p>
+                         <p>New Balance: Php ${parseFloat(newBalance).toFixed(2)}</p>`;
+    modal.style.display = "block";
+}
+
+function showTransferModalError(message) {
+    var modal = document.getElementById("transferModal");
+    var content = document.getElementById("transferModalContent");
+    content.innerHTML = "<h3>TRANSFER FAILED</h3><p>" + message + "</p>";
+    modal.style.display = "block";
+}
+
+function hideTransferModal() {
+    var modal = document.getElementById("transferModal");
+    modal.style.display = "none";
+    document.getElementById("transferModalContent").innerHTML = '';
 }
 </script>
-
 </body>
 </html>
