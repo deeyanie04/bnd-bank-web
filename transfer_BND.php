@@ -11,11 +11,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 $s3_base = "https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/";
 
 // RDS configuration
-$host = "YOUR_RDS_ENDPOINT"; // e.g., mydb.abcdefg123.us-east-1.rds.amazonaws.com
-$dbname = "bank_db";
-$username = "db_username";
-$password = "db_password";
-
+$host = "bnd-db.clkymsu642nu.ap-southeast-1.rds.amazonaws.com"; // Your RDS endpoint
+$dbname = "bank_db";       // Your database name
+$username = "admin";       // Your RDS username
+$password = "admin123";
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
