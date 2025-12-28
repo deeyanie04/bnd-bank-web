@@ -76,7 +76,37 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>Transfer BND</title>
+<link rel="stylesheet" href="styles.css">
+<script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
 <style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Josefin Sans',sans-serif;}
+body{background:#f3f5f9;}
+.wrapper{display:flex;position:relative;}
+.sidebar{width:300px;height:100%;background:#e2688a;padding:30px 0;position:fixed;}
+.sidebar ul li{padding:25px;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(0,0,0,.05);}
+.sidebar ul li a{color:#fff;display:block;}
+.sidebar ul li:hover{background:#d85375;}
+.sidebar .social_media{position:absolute;bottom:0;left:50%;transform:translateX(-50%);display:flex;}
+.sidebar .social_media a{width:40px;height:40px;margin:0 5px;text-align:center;line-height:45px;color:#fff;background:#d85375;border-radius:5px 5px 0 0;}
+.main_content{width:100%;margin-left:300px;}
+.header{margin:5%;background:#f3f5f9;color:#d85375;border-bottom:1px solid #e0e4e8;text-align:center;}
+.header p{color:#717171;font-style:italic;font-size:13px;}
+#logo{margin-left:15%;margin-bottom:5%;max-width:200px;display:block;margin:auto;}
+.transfer{max-width:600px;margin:5% auto;padding:20px;background:#fff;border-radius:10px;}
+.transfer h3{color:#e2688a;margin-bottom:10px;}
+.transfer p{margin-bottom:10px;}
+.transfer input{width:100%;padding:10px;margin-bottom:15px;border-radius:5px;border:1px solid #ccc;font-size:16px;}
+.submit-button{background:#d85375;color:#fff;padding:15px;font-size:16px;border:none;border-radius:5px;cursor:pointer;width:100%;}
+.submit-button:hover{background:pink;}
+.message{text-align:center;margin-bottom:15px;font-weight:bold;color:green;}
+.error{text-align:center;margin-bottom:15px;font-weight:bold;color:red;}
+</style>
+</head>
+    <style>
     
 *{
   margin: 0;
@@ -247,35 +277,6 @@ body{
 
 
 </style>
-<head>
-<meta charset="UTF-8">
-<title>Transfer BND</title>
-<link rel="stylesheet" href="styles.css">
-<script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Josefin Sans',sans-serif;}
-body{background:#f3f5f9;}
-.wrapper{display:flex;position:relative;}
-.sidebar{width:300px;height:100%;background:#e2688a;padding:30px 0;position:fixed;}
-.sidebar ul li{padding:25px;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(0,0,0,.05);}
-.sidebar ul li a{color:#fff;display:block;}
-.sidebar ul li:hover{background:#d85375;}
-.sidebar .social_media{position:absolute;bottom:0;left:50%;transform:translateX(-50%);display:flex;}
-.sidebar .social_media a{width:40px;height:40px;margin:0 5px;text-align:center;line-height:45px;color:#fff;background:#d85375;border-radius:5px 5px 0 0;}
-.main_content{width:100%;margin-left:300px;}
-.header{margin:5%;background:#f3f5f9;color:#d85375;border-bottom:1px solid #e0e4e8;text-align:center;}
-.header p{color:#717171;font-style:italic;font-size:13px;}
-#logo{margin-left:15%;margin-bottom:5%;max-width:200px;display:block;margin:auto;}
-.transfer{max-width:600px;margin:5% auto;padding:20px;background:#fff;border-radius:10px;}
-.transfer h3{color:#e2688a;margin-bottom:10px;}
-.transfer p{margin-bottom:10px;}
-.transfer input{width:100%;padding:10px;margin-bottom:15px;border-radius:5px;border:1px solid #ccc;font-size:16px;}
-.submit-button{background:#d85375;color:#fff;padding:15px;font-size:16px;border:none;border-radius:5px;cursor:pointer;width:100%;}
-.submit-button:hover{background:pink;}
-.message{text-align:center;margin-bottom:15px;font-weight:bold;color:green;}
-.error{text-align:center;margin-bottom:15px;font-weight:bold;color:red;}
-</style>
-</head>
 <body>
 <div class="wrapper">
     <div class="sidebar">
