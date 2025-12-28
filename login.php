@@ -60,7 +60,7 @@ input[type=submit] { background-color:#d85375; color:white; padding:10px; width:
 <div class="container">
     <div class="left-section">
         <div class="left-content">
-            <img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/cover photo.png" alt="Cover Photo">
+            <img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/banko.png" alt="Cover Photo">
         </div>
     </div>
     <div class="right-section">
