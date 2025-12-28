@@ -169,6 +169,7 @@ input, select{
   text-align:center;
 }
 button{
+  margin-top: 20px; 
   padding:10px 20px;
   background:#d85375;
   border:none;
@@ -178,6 +179,45 @@ button{
   cursor:pointer;
 }
 button:hover{opacity:.9}
+
+/* =======================
+   CUSTOM POPUP
+======================= */
+.popup {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.3);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+.popup-content {
+  background: pink;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  width: 350px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.popup-content p {
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #333;
+}
+.popup-buttons button {
+  margin: 0 10px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 5px;
+  background: #d85375;
+  color: #fff;
+  cursor: pointer;
+}
+.popup-buttons button:hover {
+  opacity: 0.9;
+}
 </style>
 </head>
 
@@ -240,9 +280,41 @@ oninput="digitsOnly(this)" required>
 </div>
 </div>
 
+<!-- CUSTOM POPUP -->
+<div id="customPopup" class="popup">
+  <div class="popup-content">
+    <p id="popupMessage"></p>
+    <div class="popup-buttons">
+      <button id="popupOk">OK</button>
+      <button id="popupCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
 function digitsOnly(input){
   input.value = input.value.replace(/\D/g,'');
+}
+
+/* Show Custom Popup */
+function showPopup(message, confirmCallback) {
+  const popup = document.getElementById("customPopup");
+  const popupMessage = document.getElementById("popupMessage");
+  const btnOk = document.getElementById("popupOk");
+  const btnCancel = document.getElementById("popupCancel");
+
+  popupMessage.textContent = message;
+  popup.style.display = "flex";
+
+  btnOk.onclick = () => {
+    popup.style.display = "none";
+    if(confirmCallback) confirmCallback(true);
+  };
+
+  btnCancel.onclick = () => {
+    popup.style.display = "none";
+    if(confirmCallback) confirmCallback(false);
+  };
 }
 
 function sendTransfer(e){
@@ -253,35 +325,39 @@ function sendTransfer(e){
   const account = targetAccount.value;
 
   if(!amount || !bank || !account){
-    alert("Please complete all fields.");
+    showPopup("Please complete all fields.");
     return;
   }
 
-  if(!confirm(
-    `Confirm Transfer?\n\nBank: ${bank}\nAccount: ${account}\nAmount: ₱${amount}`
-  )){
-    alert("Transfer cancelled.");
-    return;
-  }
+  showPopup(
+    `Confirm Transfer?\n\nBank: ${bank}\nAccount: ${account}\nAmount: ₱${amount}`,
+    function(confirmed) {
+      if(!confirmed){
+        showPopup("Transfer cancelled.");
+        return;
+      }
 
-  const xhr = new XMLHttpRequest();
-  xhr.open("POST","transfer_to_another.php",true);
-  xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST","transfer_to_another.php",true);
+      xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
 
-  xhr.onload = () => {
-    const res = JSON.parse(xhr.responseText);
-    alert(res.message);
-    if(res.status === "success"){
-      window.location.href="bank.php";
+      xhr.onload = () => {
+        const res = JSON.parse(xhr.responseText);
+        showPopup(res.message, function(){
+          if(res.status === "success"){
+            window.location.href="bank.php";
+          }
+        });
+      };
+
+      xhr.onerror = () => showPopup("Network error.");
+
+      xhr.send(
+        "withdrawAmount="+encodeURIComponent(amount)+
+        "&bankName="+encodeURIComponent(bank)+
+        "&targetAccount="+encodeURIComponent(account)
+      );
     }
-  };
-
-  xhr.onerror = () => alert("Network error.");
-
-  xhr.send(
-    "withdrawAmount="+encodeURIComponent(amount)+
-    "&bankName="+encodeURIComponent(bank)+
-    "&targetAccount="+encodeURIComponent(account)
   );
 }
 </script>
