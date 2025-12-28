@@ -47,7 +47,7 @@
 <body>
 
 <div id="loading-container">
-<img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd vertical transparent.png" alt="Logo" id="loading-logo">
+<img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/banko.png" alt="Logo" id="loading-logo">
   <div id="progress-container">
     <div id="progress-bar"></div>
   </div>
