@@ -8,10 +8,10 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 // RDS configuration
-$host = "YOUR_RDS_ENDPOINT";
-$dbname = "bank_db";
-$username = "db_username";
-$password = "db_password";
+$host = "bnd-db.clkymsu642nu.ap-southeast-1.rds.amazonaws.com"; // Your RDS endpoint
+$dbname = "bank_db";       // Your database name
+$username = "admin";       // Your RDS username
+$password = "admin123";
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
