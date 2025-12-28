@@ -358,16 +358,16 @@ body{
 
                     <select onchange="document.getElementById('bankName').value=this.value">
                         <option value="">-- Select Bank --</option>
-                        <option>Banko ni Yunise</option>
-                        <option>Banko ni Vim</option>
-                        <option>Banko ni Mea</option>
-                        <option>Banko ni Ellaine</option>
-                        <option>Banko na Debunk</option>
+                        <option>Banko De Oro</option>
+                        <option>BPI</option>
+                        <option>BDO</option>
+                        <option>CHINA BANK</option>
+                        <option>PNB</option>
                         <option>Branch of BND Savings</option>
-                        <option>Gkacrush</option>
-                        <option>Bank of DaV</option>
-                        <option>Just Bank</option>
-                        <option>Pay Meyuh</option>
+                        <option>GCash</option>
+                        <option>Maya</option>
+                        <option>Mari Bank</option>
+                        <option>Security Bank</option>
                     </select>
 
                     <input type="text"
