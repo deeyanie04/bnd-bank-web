@@ -27,7 +27,7 @@ try {
 }
 
 // Get logged-in user
-$user_id = $_SESSION['user_id'] ?? 1;
+$user_id = $_SESSION['id'] ?? 1;
 
 // Handle POST withdrawal/transfer
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $pdo->beginTransaction();
 
         // Get user's balance
-        $stmt = $pdo->prepare("SELECT id, account_number, balance FROM users WHERE user_id = ? FOR UPDATE");
+        $stmt = $pdo->prepare("SELECT id, account_number, balance FROM users WHERE id = ? FOR UPDATE");
         $stmt->execute([$user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -90,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 // Load user's account number for display
-$stmt = $pdo->prepare("SELECT account_number, balance FROM users WHERE user_id = ?");
+$stmt = $pdo->prepare("SELECT account_number, balance FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 $accountNumber = $user['account_number'] ?? 'Not Available';
