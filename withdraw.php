@@ -184,6 +184,8 @@ function withdraw(e){
     if(d.error){ alert(d.error); return; }
     document.getElementById('modalContent').innerHTML=
       `<h3>WITHDRAW SUCCESS</h3>
+      <p>(visit nearest BND branch and show </p>
+      <p> reference number to withdraw) </p>
        <p>Amount: Php ${d.amount}</p>
        <p>Date: ${d.time}</p>
        <p>Ref: ${d.ref}</p>`;
