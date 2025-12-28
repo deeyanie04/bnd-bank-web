@@ -38,7 +38,7 @@ $stmt->close();
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Banko Nueva Distrito</title>
+    <title>Banko Ng Distrito</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://kit.fontawesome.com/b99e675b6e.js"></script>
 </head>
