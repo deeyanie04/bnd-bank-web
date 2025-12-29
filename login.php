@@ -47,7 +47,7 @@ body { background: #e2688a; margin: 0; display:flex; align-items:center; justify
 .container { display: flex; width: 70%; border-radius: 10px; overflow: hidden; height: 80vh; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
 .left-section { flex: 1; display: flex; align-items: center; justify-content: center; background: linear-gradient(-45deg,#FFFDD0,#FAAAC9,#F294B4,#E2688A,#D85375,#E2688A,#F294B4,#FAAAC9,#FFFDD0); background-size: 400% 400%; animation: gradientChange 7s infinite; }
 @keyframes gradientChange { 0% {background-position:0% 50%} 50%{background-position:100% 50%} 100% {background-position:0% 50%} }
-.left-content { color:white; text-align:center; }
+.left-content { color:white; text-align:center; justify-content: center; align-items: center; }
 .right-section { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; background:#f3f5f9; }
 h1 { color:#d85375; text-align:center; }
 input[type=text], input[type=password] { width:100%; padding:10px; margin:8px 0; border:2px solid #D85375; border-radius:5px; }
