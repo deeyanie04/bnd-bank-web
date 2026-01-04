@@ -239,7 +239,8 @@ body{
 
 <div class="wrapper">
     <div class="sidebar">
-        <img src="https://https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd-bank.png" alt="Logo" id="logo">
+       
+           <img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd-bank.png" alt="Logo" id="logo">
         <ul>
             <li><img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/ICONS/HOME.png"><a href="bank.php">HOME</a></li>
             <li><img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/ICONS/DEPOSIT.png"><a href="deposit.php">DEPOSIT</a></li>
