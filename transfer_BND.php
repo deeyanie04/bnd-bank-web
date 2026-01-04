@@ -298,7 +298,7 @@ body{
     <div class="main_content">
         <div class="header">
             <h2>TRANSFER TO ANOTHER BND ACCOUNT</h2>
-            <p>Banko ni Dianne, the Best For You!</p>
+            <p>Banko ng Distrito, the Best For You!</p>
         </div>
 
         <div class="transfer">
