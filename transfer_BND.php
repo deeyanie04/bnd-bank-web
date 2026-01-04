@@ -279,7 +279,7 @@ body{
 <body>
 <div class="wrapper">
     <div class="sidebar">
-        <img src="<?php echo $s3_base; ?>bnd%20vertical%20transparent.png" alt="Logo" id="logo">
+        <img src="<?php echo $s3_base; ?>bnd-bank.png" alt="Logo" id="logo">
         <ul>
             <li><img src="<?php echo $s3_base; ?>ICONS/HOME.png"><a href="bank.php">HOME</a></li>
             <li><img src="<?php echo $s3_base; ?>ICONS/DEPOSIT.png"><a href="deposit.php">DEPOSIT</a></li>
