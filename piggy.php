@@ -198,7 +198,7 @@ body{
 
         <div class="content">
             <h3>Piggy Bank (Time Savings)</h3> 
-            <img src="<?php echo $s3_base; ?>ICONS/Piggy%20bank%202.png" alt="Piggy Bank">
+            <img src="<?php echo $s3_base; ?>ICONS/PIGGY%20BANK%202.png" alt="Piggy Bank">
             <p>This feature will be available soon. Oink! Oink!</p> 
         </div>
     </div>
