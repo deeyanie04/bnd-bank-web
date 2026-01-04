@@ -271,7 +271,7 @@ $stmt->close();
 </style>
 <div class="wrapper">
     <div class="sidebar">
-        <img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd.png" alt="Logo" id="logo">
+        <img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd vertical transparent.png" alt="Logo" id="logo">
         <ul>
             <li><img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/ICONS/HOME.png"><a href="#main_content">HOME</a></li>
             <li><img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/DEPOSIT.png"><a href="deposit.php">DEPOSIT</a></li>
