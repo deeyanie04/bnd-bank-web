@@ -109,7 +109,7 @@ body{
   <div class="main_content">
     <div class="header">
       <h2>TRANSFER TO OWN ACCOUNT</h2>
-      <p>Banko ni Dianne, Bank na Dito!</p>
+      <p>Banko ng Distrito, Bank na Dito!</p>
     </div>
 
     <div class="content">
