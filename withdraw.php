@@ -146,7 +146,7 @@ body{ background:#f3f5f9; }
 
 <div class="wrapper">
   <div class="sidebar">
-    <img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd-vertical-transparent.png">
+    <img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd-bank.png">
     <ul>
       <li><a href="bank.php">HOME</a></li>
       <li><a href="deposit.php">DEPOSIT</a></li>
