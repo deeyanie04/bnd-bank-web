@@ -160,7 +160,7 @@ button:hover{opacity:.9;}
 
 <div class="header">
 <h2>TRANSFER TO ANOTHER BANK ACCOUNT</h2>
-<p>Banko ni Dianne ang Best For You!</p>
+<p>Banko ng Distrito, the Best For You!</p>
 </div>
 
 <div class="transfer">
