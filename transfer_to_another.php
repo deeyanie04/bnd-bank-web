@@ -145,7 +145,7 @@ button:hover{opacity:.9;}
 <div class="wrapper">
 
 <div class="sidebar">
-<img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd-vertical-transparent.png" id="logo">
+<img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd-bank.png" id="logo">
 <ul>
 <li><a href="bank.php">HOME</a></li>
 <li><a href="deposit.php">DEPOSIT</a></li>
