@@ -94,7 +94,7 @@ body{
 
 <div class="wrapper">
   <div class="sidebar">
-    <img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd-vertical-transparent.png" alt="Logo">
+    <img src="https://bnd-s3-bucket.s3.ap-southeast-1.amazonaws.com/bnd-bank.png" alt="Logo">
 
     <ul>
       <li><a href="bank.php">HOME</a></li>
